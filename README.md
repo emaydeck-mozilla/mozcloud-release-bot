@@ -1,172 +1,28 @@
-# ChartKit - CLI tooling for managing Helm charts and dependencies
+# mozcloud-release-bot
+Proof of concept repository for MozCloud Release Bot
 
-Requires `uv` to run.
+## Overview and workflow
+The purpose of this app is to allow us to establish a formalized release process for the repository. We have created 2 primary workflows to accomplish this: an automatic release and a manual release.
 
-```sh
-$ uv run chartkit --help
-Usage: chartkit [OPTIONS] COMMAND [ARGS]...
+The automatic release begins while the PR is open (sets and reads labels to determine the release level and prepares user for the release) but the actual release occurs once the PR is merged to `main`. The manual release would ideally occur once changes have already been merged into `main`.
 
-  ChartKit: CLI tooling for Helm chart dependencies and utilities.
+### Automatic release
 
-Options:
-  -r, --roots TEXT  Root directories to scan for Helm charts. Can be specified
-                    multiple times.
-  --internal-only   Only include dependencies that are also found in the
-                    scanned charts.
-  --version         Show the version and exit.
-  --help            Show this message and exit.
+While the PR is open:
+1. Determine which charts were modified by the change
+2. Determine release level (major/minor/patch) either automatically using the PR title (assumes semantic commit messages are used) or directly using labels set by a user -- the no-release tag will cancel any release activities
+3. Post a comment showing a breakdown of the planned release
+4. If a user changes the label, this process starts over
 
-Commands:
-  chart                Prints Helm either a single chart details or the a...
-  charts               Prints Helm chart dependencies.
-  mermaid              Generates a diagram of Helm chart dependencies.
-  update-dependencies  Updates the dependencies for all charts.
-  version              Manage chart versions.
-```
+Once the PR is merged:
+1. Helm chart versions are bumped and chart README files are automatically updated using helm-docs
+2. New charts are packaged and pushed to GAR
+3. The chart version and README file changes are committed and pushed back to main
 
-## Charts Command
-Collects and generates a depenency graph for the given root paths.
-```sh
-$ uv run chartkit charts --help
-Usage: chartkit charts [OPTIONS]
+### Manual release
 
-  Prints Helm chart dependencies.
+This process can be run either while the PR is open or after it's merged to main. It is triggered manually by a user.
 
-Options:
-  --json  Output as JSON.
-  --help  Show this message and exit.
-```
-
-## Chart Command
-Displays information about a single chart. Can print dependency/dependent tree for the given chart or chart details.
-```sh
-$ uv run chartkit chart --help
-Usage: chartkit chart [OPTIONS] CHART
-
-  Prints Helm either a single chart details or the a tree of dependents or
-  dependencies.
-
-Options:
-  --json                          Output as JSON.
-  --mode [dependency|dependent|info]
-                                  Type of tree to display.
-  --help                          Show this message and exit.
-```
-
-#### View the depency tree of a single chart
-```sh
-uv run chartkit chart mozcloud --mode dependency
-```
-
-## Mermaid Command
-Generates mermaid charts of the previously selected chart dependency graph
-```sh
-$ uv run chartkit mermaid --help
-Usage: chartkit mermaid [OPTIONS] [CHART]
-
-  Generates a diagram of Helm chart dependencies.
-
-Options:
-  --include-attrs    Include chart attributes (version, type) in the diagram.
-  --output TEXT      Text output file for the diagram.
-  --svg-output TEXT  SVG output file for the diagram.
-  --help             Show this message and exit.
-```
-
-#### Generate mermaid chart to stdout
-```sh
-uv run chartkit mermaid
-```
-
-#### Generate mermaid chart svg
-```sh
-uv run chartkit mermaid --svg-output mozcloud.svg mozcloud
-```
-
-## Update Dependencies Command
-Does a depth first traversal of all charts found in the root directories and performs a `helm dep update` if the chart has dependencies
-
-#### Example Usage
-```sh
-$ uv run chartkit update-dependencies --help
-Usage: chartkit update-dependencies [OPTIONS] [CHARTS]...
-
-  Updates the dependencies for all charts.
-
-Options:
-  --all      Update all chart dependencies.
-  --dry-run  Show what would be changed, but do not write changes.
-  --help     Show this message and exit.
-```
-
-## Version Management
-`chartkit` can be used to manage the version of individual charts and cascade those version updates across dependent charts.
-
-#### List dependent tree and version details
-Shows a list of charts that are dependent on a single chart or a list of charts and their version information.
-```sh
-$ uv run chartkit version list --help
-Usage: chartkit version list [OPTIONS] [CHARTS]...
-
-  Lists the versions of all charts.
-
-Options:
-  --help  Show this message and exit.
-```
-
-##### Example
-```sh
-uv run chartkit version list mozcloud
-```
-
-#### Bump version
-Bumps the version of a chart and cascades to dependents.
-
-> [!NOTE]
-> Deprecated charts are ignored.
-
-```sh
-$ uv run chartkit version bump --help
-Usage: chartkit version bump [OPTIONS] [CHARTS]...
-
-  Bumps the version of a chart and cascades to dependents. Deprecated charts
-  are ignored.
-
-Options:
-  --release-type [major|minor|patch]  Semver part to increment.
-  --dry-run                           Show what would be changed, but do not
-                                      write changes.
-  --format [text|json|markdown]       Output format for results.
-  --help                              Show this message and exit.
-```
-##### Example
-For example you can take a list of changed charts and update all their versions and dependencies in one command:
-```sh
-$ uv run chartkit version bump \
-    mozcloud-gateway \
-    mozcloud-gateway-lib \
-Updating chart versions:
-mozcloud-gateway: 0.4.28
-    - dependency: mozcloud-gateway-lib -> 0.4.25
-mozcloud-gateway-lib: 0.4.25
-mozcloud: 0.10.2
-    - dependency: mozcloud-gateway-lib -> 0.4.25
-Chart versions updated.
-```
-
-#### Check Versions
-Checks staged charts and compares their versions to the current branch `HEAD` version. If the versions match (indicating a bump is necessary) the command will fail. This is specifically useful as a pre-commit check
-
-##### Example
-```sh
-$ uv run chartkit version check --help
-Usage: chartkit version check [OPTIONS] [CHARTS]...
-
-  Checks the previous version of a chart against a specific commit. If the
-  file has changed but not the version, it indicates that a version bump is
-  needed.
-
-Options:
-  --commit TEXT  Git commit to check against (default: HEAD).
-  --help         Show this message and exit.
-  ```
+1. Helm chart versions are bumped using the release type supplied by the user and chart README files are automatically updated using helm-docs
+2. New charts are packaged and pushed to GAR
+3. The chart version and README file changes are committed and pushed back to main
