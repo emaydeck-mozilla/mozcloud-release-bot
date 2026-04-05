@@ -7,11 +7,11 @@ inputs:
   gcp-project-id:
     description: GCP project ID hosting the artifact registry
     required: true
-  workload-identity-provider:
-    description: GCP workload identity provider for authentication
-    required: true
   helm-registry:
     description: OCI registry URL to push charts to
+    required: true
+  workload-identity-provider:
+    description: GCP workload identity provider for authentication
     required: true
 
 outputs:
