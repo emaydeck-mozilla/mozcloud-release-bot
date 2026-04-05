@@ -25,7 +25,6 @@ runs:
       run: |
         git config user.name "mozcloud-release-bot[bot]"
         git config user.email "${{ inputs.app-id }}+mozcloud-release-bot[bot]@users.noreply.github.com"
-        git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
         git add "**/Chart.yaml" "**/README.md"
         if git diff --cached --quiet; then
           echo "No changes to commit"

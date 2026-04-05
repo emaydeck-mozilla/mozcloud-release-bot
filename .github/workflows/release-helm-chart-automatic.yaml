@@ -163,6 +163,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -261,6 +263,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Bump chart versions and generate Helm docs
         uses: ./.github/actions/bump-and-generate-docs
