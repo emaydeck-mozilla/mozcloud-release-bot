@@ -44,8 +44,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.ref }}
           fetch-depth: 0
+          ref: ${{ github.ref }}
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Normalize chart paths
@@ -63,11 +63,12 @@ jobs:
         uses: ./.github/actions/package-and-push
         with:
           gcp-project-id: ${{ env.GAR_PROJECT_ID }}
-          workload-identity-provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
           helm-registry: ${{ env.HELM_REGISTRY }}
+          workload-identity-provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
 
-      - name: Commit, push, and tag
-        uses: ./.github/actions/commit-and-tag
+      - name: Commit, push, and create GitHub release
+        uses: ./.github/actions/commit-and-create-gh-release
         with:
+          app-id: ${{ secrets.APP_ID }}
           chart-tags: ${{ steps.package-push.outputs.chart-tags }}
           github-token: ${{ steps.app-token.outputs.token }}
