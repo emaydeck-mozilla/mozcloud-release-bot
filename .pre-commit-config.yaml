@@ -1,0 +1,41 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.0
+    hooks:
+      - id: ruff-format # formatter
+        types_or: [python, pyi, jupyter, toml]
+        exclude: 'uv\.lock$'
+      - id: ruff-check # linter
+        types_or: [python, pyi, jupyter, toml]
+        exclude: 'uv\.lock$'
+        args: [--fix]
+  - repo: local
+    hooks:
+      - id: helm-update-dependencies
+        name: helm update dependencies
+        entry: make update-dependencies
+        files: '^.*\/(application|library)\/.*(\.yaml|\.tpl)$'
+        exclude: '^deprecated/'
+        language: system
+        pass_filenames: false
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.30
+    hooks:
+      - id: helmlint
+        exclude: '^deprecated/'
+  - repo: local
+    hooks:
+      - id: helm-unittest
+        name: helm unittest
+        entry: make unit-tests-affected
+        files: '^.*\/(application|library)\/.*(\.yaml|\.tpl)$'
+        exclude: '^deprecated/'
+        language: system
+        pass_filenames: false
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.14.2
+    hooks:
+      - id: helm-docs
+        args:
+          - --template-files=./_README.md.gotmpl
+          - --template-files=README.md.gotmpl
