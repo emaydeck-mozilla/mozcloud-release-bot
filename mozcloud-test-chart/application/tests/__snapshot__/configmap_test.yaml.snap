@@ -6,4 +6,4 @@ should match snapshot:
       FOO: bar
     kind: ConfigMap
     metadata:
-      name: configmap-1
+      name: mozcloud-configmap-1

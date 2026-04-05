@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ $name }}
+  name: mozcloud-{{ $name }}
 data:
   {{- range $key, $value := $config.data }}
   {{ $key }}: {{ $value | quote }}
