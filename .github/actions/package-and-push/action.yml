@@ -67,6 +67,7 @@ runs:
           # We don't want to actually push for this proof of concept.
           cat bump-result.json
           echo helm push "${PACKAGE}" "${HELM_REGISTRY}"
+          CHART_TAGS="${CHART_TAGS} ${CHART_TAG}"
 
           # if ! helm show chart "${HELM_REGISTRY}/${CHART_NAME}" --version "${CHART_VERSION}" 2>/dev/null; then
           #   helm push "${PACKAGE}" "${HELM_REGISTRY}"
