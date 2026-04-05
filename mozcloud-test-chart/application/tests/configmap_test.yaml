@@ -1,0 +1,23 @@
+suite: configmap
+templates:
+  - configmap.yaml
+tests:
+  - it: should render without errors
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should match snapshot
+    asserts:
+      - matchSnapshot: {}
+
+  - it: should be a ConfigMap
+    asserts:
+      - isKind:
+          of: ConfigMap
+
+  - it: should contain expected data keys
+    asserts:
+      - equal:
+          path: data.FOO
+          value: bar
