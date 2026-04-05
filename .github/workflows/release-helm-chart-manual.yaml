@@ -34,6 +34,13 @@ jobs:
       id-token: write
 
     steps:
+      - name: Generate app token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v5
         with:
@@ -62,3 +69,4 @@ jobs:
         uses: ./.github/actions/commit-and-tag
         with:
           chart-tags: ${{ steps.package-push.outputs.chart-tags }}
+          github-token: ${{ steps.app-token.outputs.token }}
