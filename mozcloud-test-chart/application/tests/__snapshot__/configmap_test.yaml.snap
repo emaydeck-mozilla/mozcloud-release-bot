@@ -7,5 +7,5 @@ should match snapshot:
     kind: ConfigMap
     metadata:
       labels:
-        my-custom-label: my-custom-vlaue
+        my-custom-label: my-custom-value
       name: configmap-1
