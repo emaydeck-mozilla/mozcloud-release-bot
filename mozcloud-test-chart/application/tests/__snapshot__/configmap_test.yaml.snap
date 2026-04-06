@@ -6,4 +6,6 @@ should match snapshot:
       FOO: bar
     kind: ConfigMap
     metadata:
-      name: mozcloud-configmap-1
+      labels:
+        my-custom-label: my-custom-vlaue
+      name: configmap-1
