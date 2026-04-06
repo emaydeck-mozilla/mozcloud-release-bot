@@ -5,6 +5,7 @@ kind: ConfigMap
 metadata:
   name: {{ $name }}
   labels:
+    # This label can be used for telemetry filtering
     my-custom-label: my-custom-value
 data:
   {{- range $key, $value := $config.data }}
