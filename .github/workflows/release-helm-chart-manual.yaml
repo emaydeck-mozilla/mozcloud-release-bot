@@ -76,3 +76,4 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           chart-tags: ${{ steps.package-push.outputs.chart-tags }}
           github-token: ${{ steps.app-token.outputs.token }}
+          release-notes: ${{ inputs.release-notes }}
